@@ -167,14 +167,6 @@ input[type="submit"]:hover {
     text-decoration: none;
 }
 
-form div {
-    margin-bottom: 18px;
-}
-
-form div:last-child {
-    border-top: 1px dashed #E4E5E7;
-}
-
 form input[type="radio"] {
     margin-left: 18px;
 }
@@ -315,6 +307,79 @@ tr {
 
 tr:nth-child(2n) {
     background-color: #F7F9FA;
+}
+
+.item {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    background-color: #FFFFFF;
+    padding: 20px;
+    border: 1px solid #E4E5E7;
+    border-bottom: none;
+    position: relative;
+}
+
+.item:first-child {
+    border-top-left-radius: 3px;
+    border-top-right-radius: 3px;
+}
+
+.item:last-child {
+    border-bottom-left-radius: 3px;
+    border-bottom-right-radius: 3px;
+    border-bottom: 1px solid #E4E5E7;
+}
+
+.itemInfo {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+}
+
+.itemInfo * {
+    margin-left: 5px;
+}
+
+.icon {
+    width: 30px;
+    height: 30px;
+    border: 1px solid #bfc0c2;
+    border-radius: 3px;
+    padding: 2px;
+}
+
+.add {
+    background-color: hsl(141, 53%, 53%);
+}
+
+.edit {
+    background-color: hsl(204, 86%, 53%);
+}
+
+.delete {
+    background-color: hsl(348, 100%, 61%);
+}
+
+.purchased::before {
+    content: "";
+    height: 2px;
+    width: 100%;
+    background-color: hsl(141, 53%, 53%);
+    position: absolute;
+    left: 0;
+    top: 50%;
+}
+
+.listHeader {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    background-color: #FFFFFF;
+    padding: 20px;
 }
 
 footer {

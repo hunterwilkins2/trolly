@@ -1,0 +1,43 @@
+{{define "title"}}Home{{end}}
+
+{{define "main"}}
+    <form action="/items/add/home" method="POST">
+        <input type="hidden" name="csrf_token" value="{{.CSRFToken}}">
+        <input type="hidden" name="inCart" value="true">
+        {{with .Form.FieldErrors.item}}
+            <label class="error">{{.}}</label>
+        {{end}}
+        <input id="search" list="items" name="item" placeholder="Add item" value="{{.Form.Item}}" autocomplete="off">
+        <datalist id="items"></datalist>
+        <input type="submit" value="Add">
+    </form>
+    <div class="listHeader">
+        <h1>Grocery List</h1>
+        <h3>Total {{formatMoney .Total}}</h3>
+    </div>
+    {{if .Items}}
+     {{range .Items}}
+        <div class="item {{if .Purchased}}purchased{{end}}" id="{{.ID}}">
+            <p>{{.Name}}</p>
+            <div class="itemInfo">
+                {{if ne .Price 0.0}}
+                <p>{{formatMoney .Price}}</p>
+                {{end}}
+                <form class="iconButton" action="/items/home/{{.ID}}" method="POST">
+                    <input type="hidden" name="csrf_token" value="{{$.CSRFToken}}">
+                    <input type="hidden" name="purchased" value="{{not .Purchased}}">
+                    <input class="icon edit" type="image" alt="Edit" src="/static/img/icon-add.png">
+                </form>
+                <form class="iconButton" action="/items/home/{{.ID}}" method="POST">
+                    <input type="hidden" name="csrf_token" value="{{$.CSRFToken}}">
+                    <input type="hidden" name="inCart" value="false">
+                    <input class="icon delete" type="image" alt="Edit" src="/static/img/icon-delete.png">
+                </form>
+            </div>
+        </div>
+        {{end}}
+    {{else}}
+        <p>Your cart is empty. Add items from your pantry or just start typing.</p>
+    {{end}}
+    <script src="/static/javascript/search.js"></script>
+{{end}}

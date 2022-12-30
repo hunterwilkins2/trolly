@@ -1,17 +1,21 @@
 package main
 
 import (
+	"fmt"
 	"html/template"
 	"io/fs"
 	"path/filepath"
 	"time"
 
+	"trolly.hunterwilkins.dev/internal/models"
 	"trolly.hunterwilkins.dev/ui"
 )
 
 type templateData struct {
-	CurrentYear int
-	//Items *models.Items
+	CurrentYear     int
+	Items           []*models.Item
+	ItemID          int
+	Total           float32
 	Form            any
 	Flash           string
 	IsAuthenticated bool
@@ -26,8 +30,13 @@ func humanDate(t time.Time) string {
 	return t.UTC().Format("02 Jan 2006 at 15:04")
 }
 
+func formatMoney(m float32) string {
+	return fmt.Sprintf("$%.2f", m)
+}
+
 var functions = template.FuncMap{
-	"humanData": humanDate,
+	"humanData":   humanDate,
+	"formatMoney": formatMoney,
 }
 
 func newTemplateCache() (map[string]*template.Template, error) {

@@ -1,0 +1,24 @@
+{{define "title"}}Update{{end}}
+
+{{define "main"}}
+<form action="/items/update/{{.ItemID}}" method="POST" novalidate>
+    <input type="hidden" name="csrf_token" value="{{.CSRFToken}}">
+    <div>
+        <label>Name:</label>
+        {{with .Form.FieldErrors.name}}
+        <label class="error">{{.}}</label>
+        {{end}}
+        <input type="text" name="name" value="{{.Form.Name}}">
+    </div>
+    <div>
+        <label>Price:</label>
+        {{with .Form.FieldErrors.price}}
+        <label class="error">{{.}}</label>
+        {{end}}
+        <input type="text" name="price" value="{{.Form.Price}}">
+    </div>
+    <div>
+        <input type="submit" value="Update">
+    </div>
+</form>
+{{end}}

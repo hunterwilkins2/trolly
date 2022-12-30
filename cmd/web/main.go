@@ -27,6 +27,7 @@ type config struct {
 type application struct {
 	config         config
 	formDecoder    *form.Decoder
+	items          models.ItemModelInterface
 	logger         *log.Logger
 	sessionManager *scs.SessionManager
 	templateCache  map[string]*template.Template
@@ -63,6 +64,7 @@ func main() {
 		config:         cfg,
 		formDecoder:    formDecoder,
 		logger:         logger,
+		items:          &models.ItemModel{DB: db},
 		sessionManager: sessionManager,
 		templateCache:  templateCache,
 		users:          &models.UserModel{DB: db},
