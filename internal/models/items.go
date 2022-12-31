@@ -15,19 +15,14 @@ type Item struct {
 	LastAdded      time.Time `json:"lastAdded"`
 }
 
-type SortOptions struct {
-	Price          bool
-	TimesPurchased bool
-	LastAdded      bool
-}
-
 type ItemModelInterface interface {
 	Insert(uid int, item *Item) error
 	Get(id int) (*Item, error)
-	GetAll(uid int, name string, in_cart bool, sortby SortOptions) ([]*Item, error)
+	GetAll(uid int, name string, in_cart bool) ([]*Item, error)
 	GetByName(uid int, name string) (*Item, error)
 	Update(item *Item) error
 	Delete(id int) error
+	RemoveAllFromCart(uid int) error
 }
 
 type ItemModel struct {
@@ -72,13 +67,14 @@ func (m ItemModel) Get(id int) (*Item, error) {
 	return &item, nil
 }
 
-func (m ItemModel) GetAll(uid int, name string, in_cart bool, sortby SortOptions) ([]*Item, error) {
+func (m ItemModel) GetAll(uid int, name string, in_cart bool) ([]*Item, error) {
 	query := `
 		SELECT id, name, price, times_purchased, in_cart, purchased, last_added
 		FROM items
 		WHERE uid = ? 
 			AND (name LIKE CONCAT('%',?,'%') or ? = '')
 			AND (in_cart = ? or ? = false)
+		ORDER BY times_purchased DESC, last_added ASC
 	`
 
 	args := []any{uid, name, name, in_cart, in_cart}
@@ -188,6 +184,21 @@ func (m ItemModel) Delete(id int) error {
 
 	if rowsAffected == 0 {
 		return ErrNoRecord
+	}
+
+	return nil
+}
+
+func (m ItemModel) RemoveAllFromCart(uid int) error {
+	query := `
+		UPDATE items
+		SET in_cart = false, purchased = false
+		WHERE uid = ?	
+	`
+
+	_, err := m.DB.Exec(query, uid)
+	if err != nil {
+		return err
 	}
 
 	return nil

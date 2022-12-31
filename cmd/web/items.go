@@ -23,7 +23,7 @@ type itemAddForm struct {
 func (app *application) home(w http.ResponseWriter, r *http.Request) {
 	id, _ := app.sessionManager.Get(r.Context(), "authenticatedUserID").(int)
 
-	items, err := app.items.GetAll(id, "", true, models.SortOptions{})
+	items, err := app.items.GetAll(id, "", true)
 	if err != nil {
 		app.serverError(w, err)
 		return
@@ -44,7 +44,7 @@ func (app *application) home(w http.ResponseWriter, r *http.Request) {
 func (app *application) pantry(w http.ResponseWriter, r *http.Request) {
 	uid, _ := app.sessionManager.Get(r.Context(), "authenticatedUserID").(int)
 
-	items, err := app.items.GetAll(uid, "", false, models.SortOptions{})
+	items, err := app.items.GetAll(uid, "", false)
 	if err != nil {
 		app.serverError(w, err)
 		return
@@ -133,7 +133,7 @@ func (app *application) search(w http.ResponseWriter, r *http.Request) {
 	searchFor := params.ByName("query")
 	id, _ := app.sessionManager.Get(r.Context(), "authenticatedUserID").(int)
 
-	items, err := app.items.GetAll(id, searchFor, false, models.SortOptions{})
+	items, err := app.items.GetAll(id, searchFor, false)
 	if err != nil {
 		app.serverError(w, err)
 		return
@@ -293,4 +293,16 @@ func (app *application) deleteItem(w http.ResponseWriter, r *http.Request) {
 	}
 
 	http.Redirect(w, r, "/pantry", http.StatusSeeOther)
+}
+
+func (app *application) removeAll(w http.ResponseWriter, r *http.Request) {
+	uid, _ := app.sessionManager.Get(r.Context(), "authenticatedUserID").(int)
+
+	err := app.items.RemoveAllFromCart(uid)
+	if err != nil {
+		app.serverError(w, err)
+		return
+	}
+
+	http.Redirect(w, r, "/", http.StatusSeeOther)
 }

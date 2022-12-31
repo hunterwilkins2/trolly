@@ -5,7 +5,6 @@ import (
 
 	"github.com/julienschmidt/httprouter"
 	"github.com/justinas/alice"
-	"trolly.hunterwilkins.dev/ui"
 )
 
 func (app *application) routes() http.Handler {
@@ -15,8 +14,8 @@ func (app *application) routes() http.Handler {
 		app.notFound(w)
 	})
 
-	fileServer := http.FileServer(http.FS(ui.Files))
-	router.Handler(http.MethodGet, "/static/*filepath", fileServer)
+	fileServer := http.FileServer(http.Dir("./ui/static/"))
+	router.Handler(http.MethodGet, "/static/*filepath", http.StripPrefix("/static", fileServer))
 
 	router.HandlerFunc(http.MethodGet, "/api/healthcheck", app.healthcheckHandler)
 
@@ -40,6 +39,7 @@ func (app *application) routes() http.Handler {
 	router.Handler(http.MethodPost, "/items/home/:id", protected.ThenFunc(app.updateHomeItems))
 	router.Handler(http.MethodPost, "/items/pantry/:id", protected.ThenFunc(app.updatePantryItems))
 	router.Handler(http.MethodPost, "/items/update/:id", protected.ThenFunc(app.updateItemForm))
+	router.Handler(http.MethodPost, "/items/remove-all", protected.ThenFunc(app.removeAll))
 
 	standard := alice.New(app.logRequest)
 	return standard.Then(router)

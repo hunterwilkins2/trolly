@@ -1,13 +1,13 @@
 {{define "title"}}Home{{end}}
 
 {{define "main"}}
-    <form action="/items/add/home" method="POST">
+    <form id="addItem" action="/items/add/home" method="POST">
         <input type="hidden" name="csrf_token" value="{{.CSRFToken}}">
         <input type="hidden" name="inCart" value="true">
         {{with .Form.FieldErrors.item}}
             <label class="error">{{.}}</label>
         {{end}}
-        <input id="search" list="items" name="item" placeholder="Add item" value="{{.Form.Item}}" autocomplete="off">
+        <input id="search" list="items" name="item" placeholder="Add item to cart" value="{{.Form.Item}}" autocomplete="off">
         <datalist id="items"></datalist>
         <input type="submit" value="Add">
     </form>
@@ -26,18 +26,28 @@
                 <form class="iconButton" action="/items/home/{{.ID}}" method="POST">
                     <input type="hidden" name="csrf_token" value="{{$.CSRFToken}}">
                     <input type="hidden" name="purchased" value="{{not .Purchased}}">
-                    <input class="icon edit" type="image" alt="Edit" src="/static/img/icon-add.png">
+                    {{if not .Purchased}}
+                        <input class="icon add" type="image" src="/static/img/icon-add.png">
+                    {{else}}
+                        <input class="icon add" type="image" src="/static/img/icon-remove.png">
+                    {{end}}
                 </form>
                 <form class="iconButton" action="/items/home/{{.ID}}" method="POST">
                     <input type="hidden" name="csrf_token" value="{{$.CSRFToken}}">
                     <input type="hidden" name="inCart" value="false">
-                    <input class="icon delete" type="image" alt="Edit" src="/static/img/icon-delete.png">
+                    <input class="icon delete" type="image" src="/static/img/icon-remove-from-cart.png">
                 </form>
             </div>
         </div>
         {{end}}
+        <div class="removeAll">
+            <form action="items/remove-all/" method="POST">
+                <input type="hidden" name="csrf_token" value="{{$.CSRFToken}}">
+                <button>Remove All</button>
+            </form>
+        </div>
     {{else}}
-        <p>Your cart is empty. Add items from your pantry or just start typing.</p>
+        <p class="empty">Your cart is empty</p>
     {{end}}
     <script src="/static/javascript/search.js"></script>
 {{end}}

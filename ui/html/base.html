@@ -5,19 +5,30 @@
         <meta charset='utf-8'>
         <title>{{template "title".}} - Trolly</title>
 
+        <link rel="shortcut icon" href="/static/img/favicon.ico" type="image/x-icon">
+
+        <link rel="preconnect" href="https://fonts.googleapis.com">
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link href="https://fonts.googleapis.com/css2?family=Montserrat&family=Pacifico&display=swap" rel="stylesheet">
+
         <link  rel='stylesheet' href="/static/css/main.css">
     </head>
     <body>
-        {{template "nav" .}}
-        <main>
-            {{with .Flash}}
-                <div class="flash">{{.}}</div>
-            {{end}}
-            {{template "main" .}}
-        </main>
-        <footer>
-            Powered by <a href="https://golang.org/">Go</a> in {{.CurrentYear}}
-        </footer>
+        <div id="content">
+            <header>
+                {{template "nav" .}}
+            </header>
+            <main>
+                {{with .Flash}}
+                    <div class="flash">{{.}}</div>
+                {{end}}
+                {{template "main" .}}
+            </main>
+            <footer>
+                <p><a href="hunterwilkins.dev">hunterwilkins.dev</a></p>
+                <p>Powered by <a href="https://golang.org/">Go</a> in {{.CurrentYear}}</p> 
+            </footer>
+        </div>
     </body>
 </html>
 {{end}}

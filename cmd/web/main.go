@@ -32,6 +32,7 @@ type application struct {
 	sessionManager *scs.SessionManager
 	templateCache  map[string]*template.Template
 	users          models.UserModelInterface
+	etag           string
 }
 
 func main() {
@@ -68,6 +69,7 @@ func main() {
 		sessionManager: sessionManager,
 		templateCache:  templateCache,
 		users:          &models.UserModel{DB: db},
+		etag:           time.Now().UTC().String(),
 	}
 
 	err = app.serve()
