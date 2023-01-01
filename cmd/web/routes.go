@@ -41,6 +41,6 @@ func (app *application) routes() http.Handler {
 	router.Handler(http.MethodPost, "/items/update/:id", protected.ThenFunc(app.updateItemForm))
 	router.Handler(http.MethodPost, "/items/remove-all", protected.ThenFunc(app.removeAll))
 
-	standard := alice.New(app.logRequest)
+	standard := alice.New(app.recoverPanic, app.logRequest, secureHeaders)
 	return standard.Then(router)
 }

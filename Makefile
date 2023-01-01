@@ -42,7 +42,7 @@ docker/build:
 ## docker/run: Runs the docker image at port 4000
 .PHONY: docker/run
 docker/run:
-	docker run -d -p 4000:4000 trolly
+	docker run --network="host" -p 4000:4000 -p 3306:3306 trolly
 
 ## docker/stop: Stops the docker image
 .PHONY: docker/stop
