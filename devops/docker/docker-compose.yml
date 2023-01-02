@@ -33,3 +33,4 @@ services:
       - trolly_db:/var/lib/mysql
 volumes:
   trolly_db:
+  certs:
