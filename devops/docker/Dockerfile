@@ -9,4 +9,6 @@ FROM scratch
 COPY --from=builder /go/bin/web /go/bin/web
 COPY --from=builder /go/src/trolly.hunterwilkins.dev/trolly/ui /ui
 COPY --from=builder /etc/ssl/certs/ca-certificates.crt /certs
+EXPOSE 80
+EXPOSE 443
 ENTRYPOINT [ "/go/bin/web" ]
