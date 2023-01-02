@@ -8,13 +8,13 @@ services:
     restart: always
     ports:
       - 4000:4000
-    command: "-env production -dsn trolly:secret_trolly_password@tcp(db)/trolly?parseTime=true"
+    command: ["-env production -dsn trolly:secret_trolly_password@tcp(db)/trolly?parseTime=true"]
     depends_on:
       db:
         condition: service_healthy
   migrations:
     image: migrate/migrate
-    command: "-path=/migrations -database mysql://trolly:secret_trolly_password@tcp(db)/trolly up"
+    command: ["-path=/migrations -database mysql://trolly:secret_trolly_password@tcp(db)/trolly up"]
     volumes:
       - ../../migrations:/migrations
     depends_on:
@@ -22,7 +22,7 @@ services:
         condition: service_healthy
   db:
     container_name: trolly_db
-    image: mariadb
+    image: jsurf/rpi-mariadb
     restart: always
     environment:
       - MYSQL_RANDOM_ROOT_PASSWORD=yes
