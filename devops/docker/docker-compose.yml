@@ -12,14 +12,6 @@ services:
     depends_on:
       db:
         condition: service_healthy
-  migrations:
-    image: migrate/migrate
-    command: ["-path=/migrations -database mysql://trolly:secret_trolly_password@tcp(db)/trolly up"]
-    volumes:
-      - ../../migrations:/migrations
-    depends_on:
-      db:
-        condition: service_healthy
   db:
     container_name: trolly_db
     image: jsurf/rpi-mariadb
@@ -37,4 +29,3 @@ services:
       - trolly_db:/var/lib/mysql
 volumes:
   trolly_db:
-  migrations:
