@@ -28,8 +28,10 @@ func (app *application) serve() error {
 		},
 	}
 
-	app.logger.Printf("starting %s server on port :%d", app.config.env, app.config.port)
+	app.logger.Println("getting tls certificates")
 	go http.ListenAndServe(":80", certManager.HTTPHandler(nil))
+
+	app.logger.Printf("starting %s server on port :%d", app.config.env, app.config.port)
 	err := srv.ListenAndServeTLS("", "")
 	if !errors.Is(err, http.ErrServerClosed) {
 		return err

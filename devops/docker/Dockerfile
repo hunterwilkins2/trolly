@@ -8,7 +8,8 @@ RUN CGO_ENABLED=0 GOOS=linux GOARCH=arm go build -ldflags='-w -s' -o=/go/bin/web
 FROM scratch
 COPY --from=builder /go/bin/web /go/bin/web
 COPY --from=builder /go/src/trolly.hunterwilkins.dev/trolly/ui /ui
-COPY --from=builder /etc/ssl/certs/ca-certificates.crt /certs
+COPY --from=builder /etc/ssl/certs/ca-certificates.crt /etc/ssl/certs/
 EXPOSE 80
 EXPOSE 443
+VOLUME [ "/certs" ]
 ENTRYPOINT [ "/go/bin/web" ]

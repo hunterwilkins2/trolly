@@ -9,8 +9,6 @@ services:
     ports:
       - 4000:4000
     command: ["-env", "production", "-dsn", "trolly:secret_trolly_password@tcp(db)/trolly?parseTime=true"]
-    volumes:
-      - certs:/certs
     depends_on:
       db:
         condition: service_healthy
@@ -31,4 +29,3 @@ services:
       - trolly_db:/var/lib/mysql
 volumes:
   trolly_db:
-  certs:
