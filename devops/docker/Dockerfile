@@ -3,7 +3,7 @@ RUN apk update && apk add --no-cache git
 WORKDIR $GOPATH/src/trolly.hunterwilkins.dev/trolly/
 COPY . .
 RUN go get -d -v ./cmd/web
-RUN CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -ldflags='-w -s' -o=/go/bin/web ./cmd/web
+RUN CGO_ENABLED=0 GOOS=linux GOARCH=arm go build -ldflags='-w -s' -o=/go/bin/web ./cmd/web
 
 FROM scratch
 COPY --from=builder /go/bin/web /go/bin/web
