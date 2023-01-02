@@ -2,7 +2,6 @@
 
 {{define "main"}}
    <form id="addItem" action="/items/add/pantry" method="POST">
-        <input type="hidden" name="csrf_token" value="{{.CSRFToken}}">
         {{with .Form.FieldErrors.item}}
             <label class="error">{{.}}</label>
         {{end}}        
@@ -18,7 +17,6 @@
                         <p>{{formatMoney .Price}}</p>
                     {{end}}
                     <form class="iconButton" action="/items/pantry/{{.ID}}" method="POST">
-                        <input type="hidden" name="csrf_token" value="{{$.CSRFToken}}">
                         <input type="hidden" name="inCart" value="true">
                         <input class="icon add" type="image" src="/static/img/icon-add-to-cart.png">
                     </form>
@@ -26,7 +24,6 @@
                         <input class="icon edit" type="image" src="/static/img/icon-edit.png">
                     </form>
                     <form class="iconButton" action="/items/delete/{{.ID}}" method="POST">
-                        <input type="hidden" name="csrf_token" value="{{$.CSRFToken}}">
                         <input class="icon delete" type="image" src="/static/img/icon-delete.png">
                     </form>
                 </div>
