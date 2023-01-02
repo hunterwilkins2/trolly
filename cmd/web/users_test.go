@@ -13,9 +13,6 @@ func TestUserSignup(t *testing.T) {
 	ts := newTestServer(t, app.routes())
 	defer ts.Close()
 
-	_, _, body := ts.get(t, "/user/signup")
-	validCSRFToken := extractCSRFToken(t, body)
-
 	const (
 		validName     = "Bob"
 		validPassword = "validPa$$word"
@@ -28,7 +25,6 @@ func TestUserSignup(t *testing.T) {
 		userName     string
 		userEmail    string
 		userPassword string
-		csrfToken    string
 		wantCode     int
 		wantFormTag  string
 	}{
@@ -37,23 +33,13 @@ func TestUserSignup(t *testing.T) {
 			userName:     validName,
 			userEmail:    validEmail,
 			userPassword: validPassword,
-			csrfToken:    validCSRFToken,
 			wantCode:     http.StatusSeeOther,
-		},
-		{
-			name:         "Invalid CSRF Token",
-			userName:     validName,
-			userEmail:    validEmail,
-			userPassword: validPassword,
-			csrfToken:    "wrongToken",
-			wantCode:     http.StatusBadRequest,
 		},
 		{
 			name:         "Empty name",
 			userName:     "",
 			userEmail:    validEmail,
 			userPassword: validPassword,
-			csrfToken:    validCSRFToken,
 			wantCode:     http.StatusUnprocessableEntity,
 			wantFormTag:  formTag,
 		},
@@ -62,7 +48,6 @@ func TestUserSignup(t *testing.T) {
 			userName:     validName,
 			userEmail:    "",
 			userPassword: validPassword,
-			csrfToken:    validCSRFToken,
 			wantCode:     http.StatusUnprocessableEntity,
 			wantFormTag:  formTag,
 		},
@@ -71,7 +56,6 @@ func TestUserSignup(t *testing.T) {
 			userName:     validName,
 			userEmail:    validEmail,
 			userPassword: "",
-			csrfToken:    validCSRFToken,
 			wantCode:     http.StatusUnprocessableEntity,
 			wantFormTag:  formTag,
 		},
@@ -80,7 +64,6 @@ func TestUserSignup(t *testing.T) {
 			userName:     validName,
 			userEmail:    "bob@example.",
 			userPassword: validPassword,
-			csrfToken:    validCSRFToken,
 			wantCode:     http.StatusUnprocessableEntity,
 			wantFormTag:  formTag,
 		},
@@ -89,7 +72,6 @@ func TestUserSignup(t *testing.T) {
 			userName:     validName,
 			userEmail:    validEmail,
 			userPassword: "pa$$",
-			csrfToken:    validCSRFToken,
 			wantCode:     http.StatusUnprocessableEntity,
 			wantFormTag:  formTag,
 		},
@@ -98,7 +80,6 @@ func TestUserSignup(t *testing.T) {
 			userName:     validName,
 			userEmail:    "dupe@example.com",
 			userPassword: validPassword,
-			csrfToken:    validCSRFToken,
 			wantCode:     http.StatusUnprocessableEntity,
 			wantFormTag:  formTag,
 		},
@@ -110,7 +91,6 @@ func TestUserSignup(t *testing.T) {
 			form.Add("name", tt.userName)
 			form.Add("email", tt.userEmail)
 			form.Add("password", tt.userPassword)
-			form.Add("csrf_token", tt.csrfToken)
 
 			code, _, body := ts.postForm(t, "/user/signup", form)
 
@@ -128,9 +108,6 @@ func TestUserLogin(t *testing.T) {
 	ts := newTestServer(t, app.routes())
 	defer ts.Close()
 
-	_, _, body := ts.get(t, "/user/login")
-	validCSRFToken := extractCSRFToken(t, body)
-
 	const (
 		validPassword = "pa$$word"
 		validEmail    = "alice@example.com"
@@ -141,7 +118,6 @@ func TestUserLogin(t *testing.T) {
 		name         string
 		userEmail    string
 		userPassword string
-		csrfToken    string
 		wantCode     int
 		wantFormTag  string
 	}{
@@ -149,21 +125,12 @@ func TestUserLogin(t *testing.T) {
 			name:         "Valid submission",
 			userEmail:    validEmail,
 			userPassword: validPassword,
-			csrfToken:    validCSRFToken,
 			wantCode:     http.StatusSeeOther,
-		},
-		{
-			name:         "Invalid CSRF Token",
-			userEmail:    validEmail,
-			userPassword: validPassword,
-			csrfToken:    "wrongToken",
-			wantCode:     http.StatusBadRequest,
 		},
 		{
 			name:         "Empty email",
 			userEmail:    "",
 			userPassword: validPassword,
-			csrfToken:    validCSRFToken,
 			wantCode:     http.StatusUnprocessableEntity,
 			wantFormTag:  formTag,
 		},
@@ -171,7 +138,6 @@ func TestUserLogin(t *testing.T) {
 			name:         "Empty password",
 			userEmail:    validEmail,
 			userPassword: "",
-			csrfToken:    validCSRFToken,
 			wantCode:     http.StatusUnprocessableEntity,
 			wantFormTag:  formTag,
 		},
@@ -179,7 +145,6 @@ func TestUserLogin(t *testing.T) {
 			name:         "Invalid email",
 			userEmail:    "bob@example.",
 			userPassword: validPassword,
-			csrfToken:    validCSRFToken,
 			wantCode:     http.StatusUnprocessableEntity,
 			wantFormTag:  formTag,
 		},
@@ -187,7 +152,6 @@ func TestUserLogin(t *testing.T) {
 			name:         "Short password",
 			userEmail:    validEmail,
 			userPassword: "pa$$",
-			csrfToken:    validCSRFToken,
 			wantCode:     http.StatusUnprocessableEntity,
 			wantFormTag:  formTag,
 		},
@@ -195,7 +159,6 @@ func TestUserLogin(t *testing.T) {
 			name:         "Duplicate email",
 			userEmail:    "dupe@example.com",
 			userPassword: validPassword,
-			csrfToken:    validCSRFToken,
 			wantCode:     http.StatusUnprocessableEntity,
 			wantFormTag:  formTag,
 		},
@@ -206,7 +169,6 @@ func TestUserLogin(t *testing.T) {
 			form := url.Values{}
 			form.Add("email", tt.userEmail)
 			form.Add("password", tt.userPassword)
-			form.Add("csrf_token", tt.csrfToken)
 
 			code, _, body := ts.postForm(t, "/user/login", form)
 
@@ -223,11 +185,7 @@ func TestUserLogout(t *testing.T) {
 	app := newTestApplication(t)
 	ts := newTestServer(t, app.routes())
 
-	_, _, body := ts.get(t, "/user/login")
-	validCSRFToken := extractCSRFToken(t, body)
-
 	form := url.Values{}
-	form.Add("csrf_token", validCSRFToken)
 	code, _, _ := ts.postForm(t, "/user/logout", form)
 
 	assert.Equal(t, code, http.StatusSeeOther)

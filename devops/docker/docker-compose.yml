@@ -8,15 +8,7 @@ services:
     restart: always
     ports:
       - 4000:4000
-    command: ["-env production -dsn trolly:secret_trolly_password@tcp(db)/trolly?parseTime=true"]
-    depends_on:
-      db:
-        condition: service_healthy
-  migrations:
-    image: migrate/migrate
-    command: ["-path=/migrations -database mysql://trolly:secret_trolly_password@tcp(db)/trolly up"]
-    volumes:
-      - ../../migrations:/migrations
+    command: ["-env", "production", "-dsn", "trolly:secret_trolly_password@tcp(db)/trolly?parseTime=true"]
     depends_on:
       db:
         condition: service_healthy
@@ -37,4 +29,3 @@ services:
       - trolly_db:/var/lib/mysql
 volumes:
   trolly_db:
-  migrations:

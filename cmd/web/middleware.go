@@ -4,8 +4,6 @@ import (
 	"context"
 	"fmt"
 	"net/http"
-
-	"github.com/justinas/nosurf"
 )
 
 func (app *application) logRequest(next http.Handler) http.Handler {
@@ -14,17 +12,6 @@ func (app *application) logRequest(next http.Handler) http.Handler {
 
 		next.ServeHTTP(w, r)
 	})
-}
-
-func noSurf(next http.Handler) http.Handler {
-	csrfHandler := nosurf.New(next)
-	csrfHandler.SetBaseCookie(http.Cookie{
-		HttpOnly: true,
-		Path:     "/",
-		Secure:   true,
-	})
-
-	return csrfHandler
 }
 
 func (app *application) authenticate(next http.Handler) http.Handler {
