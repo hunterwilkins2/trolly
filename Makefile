@@ -1,4 +1,3 @@
-include .envrc
 # ==================================================================================== #
 # HELPERS
 # ==================================================================================== #
@@ -48,6 +47,11 @@ docker/run:
 .PHONY: docker/stop
 docker/stop:
 	docker stop $$(docker ps -q --filter ancestor=trolly)
+
+## docker-compose/up: Starts the docker compose stack
+.PHONY: docker-compose/up
+docker-compose/up:
+	docker-compose -f devops/docker/docker-compose.yml up
 
 # ==================================================================================== #
 # TESTING

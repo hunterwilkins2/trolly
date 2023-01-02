@@ -7,5 +7,5 @@ RUN CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -ldflags='-w -s' -o=/go/bin/w
 
 FROM scratch
 COPY --from=builder /go/bin/web /go/bin/web
-COPY --from=builder /go/src/trolly.hunterwilkins.dev/trolly/ui /go/bin/ui
+COPY --from=builder /go/src/trolly.hunterwilkins.dev/trolly/ui /ui
 ENTRYPOINT [ "/go/bin/web" ]
