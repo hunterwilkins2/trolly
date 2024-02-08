@@ -1,4 +1,40 @@
 package components 
 
-templ base() {
+templ Base(title string) {
+	<!DOCTYPE html>
+	<html lang="en">
+		<head>
+			<meta charset="UTF-8"/>
+			<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+			<link rel="icon" href="data:;base64,iVBORw0KGgo="/> /* disable favicon */
+			<script src="https://unpkg.com/htmx.org@1.9.5" integrity="sha384-xcuj3WpfgjlKF+FXhSQFQ0ZNr39ln+hwjN3npfM9VBnUskLolQAcN80McRIVOPuO" crossorigin="anonymous"></script>
+			<link rel="stylesheet" href="static/css/dist/output.css"/>
+			<title>
+				if title != "" {
+					title
+				} else {
+					Trolly
+				}
+			</title>
+		</head>
+		<body>
+			<header></header>
+			{ children... }
+			<footer></footer>
+			if ctx.Value(HotReloadKey).(bool) {
+				<script src="static/js/hot-reload.js"></script>
+			}
+		</body>
+	</html>
 }
+
+type contextKey string
+
+func (c contextKey) String() string {
+	return string(c)
+}
+
+var (
+	HotReloadKey = contextKey("hot-reload")
+	UserIdKey    = contextKey("userId")
+)
