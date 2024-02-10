@@ -24,7 +24,10 @@ build: tailwind/build templ/build
 ## db: starts a MySQL docker container
 .PHONY: db
 db:
-	docker run --name trolly-db -p 3306:3360 -e MYSQL_DATABASE=trolly -e MYSQL_ROOT_PASSWORD=admin -d mysql:latest
+	docker run --name trolly-db -p 3306:3306 -e MARIADB_DATABASE=trolly -e MARIADB_ROOT_PASSWORD=admin -e MARIADB_USER=trolly -e MARIADB_PASSWORD=pa55word -d mariadb:latest
+
+migrate:
+	migrate -path=./migrations -database="mysql://trolly:pa55word@tcp(0.0.0.0:3306)/trolly" up
 
 # Utilites
 .PHONY: help

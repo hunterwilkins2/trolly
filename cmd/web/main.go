@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"database/sql"
+	"encoding/gob"
 	"flag"
 	"fmt"
 	"log/slog"
@@ -13,23 +14,29 @@ import (
 	"time"
 
 	"github.com/alexedwards/flow"
+	"github.com/alexedwards/scs/mysqlstore"
+	"github.com/alexedwards/scs/v2"
 	_ "github.com/go-sql-driver/mysql"
+	"github.com/google/uuid"
+	"github.com/hunterwilkins2/trolly/internal/models"
 	"github.com/hunterwilkins2/trolly/internal/service"
 )
 
 type application struct {
-	items service.Item
-	users service.User
+	items *service.Item
+	users *service.UserService
 
-	logger *slog.Logger
+	sessionManager *scs.SessionManager
+	logger         *slog.Logger
 }
 
 func main() {
+	gob.Register(uuid.New())
 	port := flag.Int("port", 4000, "Port to serve server on")
 	hotReload := flag.Bool("hot-reload", false, "Hot-reload web browser on save")
-	dbHost := flag.String("db-host", "127.0.0.1:3306", "MySQL hostname")
-	dbUser := flag.String("db-user", "root", "MySQL username")
-	dbPass := flag.String("db-pass", "admin", "MySQL password")
+	dbHost := flag.String("db-host", "0.0.0.0:3306", "MySQL hostname")
+	dbUser := flag.String("db-user", "trolly", "MySQL username")
+	dbPass := flag.String("db-pass", "pa55word", "MySQL password")
 	dbName := flag.String("db-name", "trolly", "MySQL database name")
 	flag.Parse()
 
@@ -43,8 +50,16 @@ func main() {
 	}
 	defer db.Close()
 
+	sessionManager := scs.New()
+	sessionManager.Store = mysqlstore.New(db)
+
+	userRepo := models.NewUserRepository(db)
+	userService := service.NewUserService(userRepo)
+
 	app := &application{
-		logger: logger,
+		users:          userService,
+		sessionManager: sessionManager,
+		logger:         logger,
 	}
 
 	mux := flow.New()
@@ -56,11 +71,23 @@ func main() {
 	fs := http.FileServer(http.Dir("./static"))
 	mux.Handle("/static/...", http.StripPrefix("/static/", fs))
 
-	mux.Use(UseHotReload(*hotReload))
-	mux.HandleFunc("/", app.GroceryListPage, http.MethodGet)
-	mux.HandleFunc("/pantry", app.PantryPage, http.MethodGet)
+	mux.Use(app.RecoverPanic, UseHotReload(*hotReload), app.LogRequest, sessionManager.LoadAndSave)
 	mux.HandleFunc("/signup", app.RegisterPage, http.MethodGet)
+	mux.HandleFunc("/register", app.Register, http.MethodPost)
+	mux.HandleFunc("/user/validate/name", app.ValidateName, http.MethodPost)
+	mux.HandleFunc("/user/validate/email", app.ValidateEmail, http.MethodPost)
+	mux.HandleFunc("/user/validate/password", app.ValidatePassword, http.MethodPost)
+
 	mux.HandleFunc("/login", app.LoginPage, http.MethodGet)
+	mux.HandleFunc("/login", app.Login, http.MethodPost)
+	mux.HandleFunc("/logout", app.Logout, http.MethodPost)
+
+	mux.Group(func(m *flow.Mux) {
+		mux.Use(app.Authenticated)
+		mux.HandleFunc("/", app.GroceryListPage, http.MethodGet)
+		mux.HandleFunc("/pantry", app.PantryPage, http.MethodGet)
+
+	})
 
 	srv := &http.Server{
 		Addr:              fmt.Sprintf("127.0.0.1:%d", *port),
@@ -109,8 +136,8 @@ func openDb(dbHost, dbUser, dbPass, dbName string) (*sql.DB, error) {
 	db.SetConnMaxIdleTime(3 * time.Minute)
 	db.SetMaxOpenConns(10)
 	db.SetMaxIdleConns(10)
-	// if err = db.Ping(); err != nil {
-	// 	return nil, err
-	// }
+	if err = db.Ping(); err != nil {
+		return nil, err
+	}
 	return db, nil
 }

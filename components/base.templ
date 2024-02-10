@@ -1,26 +1,52 @@
 package components 
 
+import (
+	"time"
+	"fmt"
+)
+
 templ Base(title string) {
 	<!DOCTYPE html>
 	<html lang="en">
 		<head>
 			<meta charset="UTF-8"/>
 			<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-			<link rel="icon" href="data:;base64,iVBORw0KGgo="/> /* disable favicon */
 			<script src="https://unpkg.com/htmx.org@1.9.5" integrity="sha384-xcuj3WpfgjlKF+FXhSQFQ0ZNr39ln+hwjN3npfM9VBnUskLolQAcN80McRIVOPuO" crossorigin="anonymous"></script>
+			<link rel="preconnect" href="https://fonts.googleapis.com"/>
+			<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+			<link href="https://fonts.googleapis.com/css2?family=Pacifico&display=swap" rel="stylesheet"/>
+			<link rel="shortcut icon" href="/static/img/favicon.ico" type="image/x-icon"/>
 			<link rel="stylesheet" href="static/css/dist/output.css"/>
 			<title>
+				Trolly
 				if title != "" {
-					title
-				} else {
-					Trolly
+					- { title }
 				}
 			</title>
 		</head>
-		<body>
-			<header></header>
-			{ children... }
-			<footer></footer>
+		<body class="mx-[5%] md:mx-[15%] lg:mx-[20%] text-neutral-700 bg-zinc-100 dark:text-neutral-200 dark:bg-zinc-800 flex flex-col min-h-screen">
+			<header class="py-5 flex items-center justify-between">
+				<div class="flex items-center">
+					<img src="/static/img/logo.svg" class="h-6 mr-2"/>
+					<a href="/" class="text-2xl font-pacifico text-logoYellow dark:darkLogoYellow">Trolly</a>
+				</div>
+				<div class="flex items-center space-x-3 font-semibold">
+					if name, ok := ctx.Value(UserKey).(string); ok {
+						<p class="inline truncate">Welcome, { name }</p>
+						<a hx-post="logout" hx-push-url="true" class="py-2 px-2 rounded-lg text-neutral-800 bg-logoYellow dark:darkLogoYellow shadow-md">Logout</a>
+					} else {
+						<a href="/signup">Sign up</a>
+						<a href="/login" class="py-2 px-2 rounded-lg text-neutral-800 bg-logoYellow dark:darkLogoYellow shadow-md">Log in</a>
+					}
+				</div>
+			</header>
+			<main class="flex-1 flex justify-center">
+				{ children... }
+			</main>
+			<footer class="py-10 text-xs text-gray-500 dark:text-gray-300">
+				<p>&copy { fmt.Sprint(time.Now().Year()) } Hunter Wilkins</p>
+				<a href="https://www.hunterwilkins.dev" class="text-sky-600 dark:text-sky-400 hover:underline">hunterwilkins.dev</a>
+			</footer>
 			if ctx.Value(HotReloadKey).(bool) {
 				<script src="static/js/hot-reload.js"></script>
 			}
@@ -36,5 +62,6 @@ func (c contextKey) String() string {
 
 var (
 	HotReloadKey = contextKey("hot-reload")
-	UserIdKey    = contextKey("userId")
+	UserKey      = contextKey("userName")
+	FlashKey     = contextKey("flash")
 )

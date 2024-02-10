@@ -1,0 +1,1 @@
+deb https://packagecloud.io/golang-migrate/migrate/ubuntu/ bookworm main /etc/apt/sources.list.d/migrate.list
