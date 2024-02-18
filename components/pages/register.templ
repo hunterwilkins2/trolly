@@ -8,7 +8,7 @@ templ Register(values map[string]string, errors map[string]error) {
  			action="/register"
  			method="post"
  			hx-boost="true"
- 			class="self-center w-full h-min bg-white dark:bg-zinc-700 shadow-md rounded px-8 pt-6 pb-8"
+ 			class="self-center w-full  max-w-[35rem] h-min bg-white dark:bg-zinc-700 shadow-md rounded px-8 pt-6 pb-8"
  			hx-indicator="#indicator"
 		>
 			<h1 class="text-xl font-bold mb-4">Sign Up</h1>
@@ -31,6 +31,7 @@ templ Register(values map[string]string, errors map[string]error) {
  					hx-trigger="keyup changed delay:500ms"
  					hx-target="next .error"
  					hx-sync="this:replace"
+ 					hx-indicator="this"
 				/>
 				<div class="error">
 					if errors != nil && errors["name"] != nil {
@@ -52,6 +53,7 @@ templ Register(values map[string]string, errors map[string]error) {
  					hx-trigger="keyup changed delay:500ms"
  					hx-target="next .error"
  					hx-sync="this:replace"
+ 					hx-indicator="this"
 				/>
 				<div class="error">
 					if errors != nil && errors["email"] != nil {
@@ -72,6 +74,7 @@ templ Register(values map[string]string, errors map[string]error) {
  					hx-trigger="keyup changed delay:500ms"
  					hx-target="next .error"
  					hx-sync="this:replace"
+ 					hx-indicator="this"
 				/>
 				<div class="error">
 					if errors != nil && errors["password"] != nil {

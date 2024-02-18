@@ -23,8 +23,9 @@ import (
 )
 
 type application struct {
-	items *service.Item
-	users *service.UserService
+	items  *service.ItemService
+	users  *service.UserService
+	basket *service.BasketService
 
 	sessionManager *scs.SessionManager
 	logger         *slog.Logger
@@ -40,7 +41,7 @@ func main() {
 	dbName := flag.String("db-name", "trolly", "MySQL database name")
 	flag.Parse()
 
-	logHandler := slog.NewTextHandler(os.Stdout, &slog.HandlerOptions{})
+	logHandler := slog.NewTextHandler(os.Stdout, &slog.HandlerOptions{Level: slog.LevelDebug})
 	logger := slog.New(logHandler)
 
 	db, err := openDb(*dbHost, *dbUser, *dbPass, *dbName)
@@ -56,8 +57,16 @@ func main() {
 	userRepo := models.NewUserRepository(db)
 	userService := service.NewUserService(userRepo)
 
+	itemRepo := models.NewItemRepository(db)
+	itemService := service.NewItemService(itemRepo)
+
+	basketRepo := models.NewBasketRepository(db)
+	basketService := service.NewBasketService(basketRepo)
+
 	app := &application{
 		users:          userService,
+		items:          itemService,
+		basket:         basketService,
 		sessionManager: sessionManager,
 		logger:         logger,
 	}
@@ -87,6 +96,18 @@ func main() {
 		mux.HandleFunc("/", app.GroceryListPage, http.MethodGet)
 		mux.HandleFunc("/pantry", app.PantryPage, http.MethodGet)
 
+		mux.HandleFunc("/search", app.Search, http.MethodPost)
+		mux.HandleFunc("/items", app.AddItem, http.MethodPost)
+		mux.HandleFunc("/items/:id", app.DeleteItem, http.MethodDelete)
+		mux.HandleFunc("/items/edit", app.EditItemPage, http.MethodGet)
+		mux.HandleFunc("/items/:id", app.EditItem, http.MethodPatch)
+
+		mux.HandleFunc("/suggestions", app.Suggest, http.MethodGet)
+		mux.HandleFunc("/basket", app.CreateNewItemAndAddToBasket, http.MethodPost)
+		mux.HandleFunc("/basket/:itemId", app.AddItemToBasket, http.MethodPost)
+		mux.HandleFunc("/basket/:id", app.MarkPurchased, http.MethodPatch)
+		mux.HandleFunc("/basket/:id", app.RemoveItemFromBasket, http.MethodDelete)
+		mux.HandleFunc("/basket", app.RemoveAllItems, http.MethodDelete)
 	})
 
 	srv := &http.Server{

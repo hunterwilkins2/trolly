@@ -31,7 +31,7 @@ func Register(values map[string]string, errors map[string]error) templ.Component
 				templ_7745c5c3_Buffer = templ.GetBuffer()
 				defer templ.ReleaseBuffer(templ_7745c5c3_Buffer)
 			}
-			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<form action=\"/register\" method=\"post\" hx-boost=\"true\" class=\"self-center w-full h-min bg-white dark:bg-zinc-700 shadow-md rounded px-8 pt-6 pb-8\" hx-indicator=\"#indicator\"><h1 class=\"text-xl font-bold mb-4\">")
+			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<form action=\"/register\" method=\"post\" hx-boost=\"true\" class=\"self-center w-full  max-w-[35rem] h-min bg-white dark:bg-zinc-700 shadow-md rounded px-8 pt-6 pb-8\" hx-indicator=\"#indicator\"><h1 class=\"text-xl font-bold mb-4\">")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
@@ -76,7 +76,7 @@ func Register(values map[string]string, errors map[string]error) templ.Component
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("\" novalidate class=\"shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 dark:text-gray-200 dark:bg-zinc-800  dark:border-zinc-900 dark:placeholder:text-gray-400 leading-tight focus:outline-none focus:shadow-outline\" hx-post=\"/user/validate/name\" hx-trigger=\"keyup changed delay:500ms\" hx-target=\"next .error\" hx-sync=\"this:replace\"><div class=\"error\">")
+			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("\" novalidate class=\"shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 dark:text-gray-200 dark:bg-zinc-800  dark:border-zinc-900 dark:placeholder:text-gray-400 leading-tight focus:outline-none focus:shadow-outline\" hx-post=\"/user/validate/name\" hx-trigger=\"keyup changed delay:500ms\" hx-target=\"next .error\" hx-sync=\"this:replace\" hx-indicator=\"this\"><div class=\"error\">")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
@@ -104,7 +104,7 @@ func Register(values map[string]string, errors map[string]error) templ.Component
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("\" class=\"shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 dark:text-gray-200 dark:bg-zinc-800  dark:border-zinc-900 dark:placeholder:text-gray-400 leading-tight focus:outline-none focus:shadow-outline\" hx-post=\"/user/validate/email\" hx-trigger=\"keyup changed delay:500ms\" hx-target=\"next .error\" hx-sync=\"this:replace\"><div class=\"error\">")
+			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("\" class=\"shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 dark:text-gray-200 dark:bg-zinc-800  dark:border-zinc-900 dark:placeholder:text-gray-400 leading-tight focus:outline-none focus:shadow-outline\" hx-post=\"/user/validate/email\" hx-trigger=\"keyup changed delay:500ms\" hx-target=\"next .error\" hx-sync=\"this:replace\" hx-indicator=\"this\"><div class=\"error\">")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
@@ -124,7 +124,7 @@ func Register(values map[string]string, errors map[string]error) templ.Component
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("</label> <input type=\"password\" name=\"password\" id=\"password\" placeholder=\"Password\" novalidate class=\"shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 dark:text-gray-200 dark:bg-zinc-800  dark:border-zinc-900 dark:placeholder:text-gray-400 leading-tight focus:outline-none focus:shadow-outline\" hx-post=\"/user/validate/password\" hx-trigger=\"keyup changed delay:500ms\" hx-target=\"next .error\" hx-sync=\"this:replace\"><div class=\"error\">")
+			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("</label> <input type=\"password\" name=\"password\" id=\"password\" placeholder=\"Password\" novalidate class=\"shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 dark:text-gray-200 dark:bg-zinc-800  dark:border-zinc-900 dark:placeholder:text-gray-400 leading-tight focus:outline-none focus:shadow-outline\" hx-post=\"/user/validate/password\" hx-trigger=\"keyup changed delay:500ms\" hx-target=\"next .error\" hx-sync=\"this:replace\" hx-indicator=\"this\"><div class=\"error\">")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}

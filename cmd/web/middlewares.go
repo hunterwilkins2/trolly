@@ -31,7 +31,7 @@ func (app *application) Authenticated(next http.Handler) http.Handler {
 			http.Redirect(w, r, "/login", http.StatusSeeOther)
 			return
 		}
-		r = r.WithContext(context.WithValue(r.Context(), components.UserKey, user.Name))
+		r = r.WithContext(context.WithValue(r.Context(), components.UserKey, user.ID))
 		next.ServeHTTP(w, r)
 	})
 }
