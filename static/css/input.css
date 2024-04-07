@@ -1,0 +1,55 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+.error {
+    color: theme('colors.red.400');
+    font-style: italic;
+    min-height: theme('lineHeight.6');
+    margin-left: theme('spacing.1')
+}
+
+.htmx-indicator {
+    display: none;
+}
+
+.htmx-request .htmx-indicator {
+    display: inline;
+}
+
+.htmx-request.htmx-indicator {
+    display: inline;
+}
+
+button.htmx-indicator {
+    display: block;
+    opacity: 1;
+}
+
+button.htmx-request {
+    display: block;
+}
+
+button.htmx-indicator span {
+    display: block;
+}
+
+button.htmx-indicator img {
+    display: none;
+}
+
+button.htmx-request .htmx-indicator span {
+    display: none;
+}
+
+button.htmx-request .htmx-indicator img {
+    display: inline;
+}
+
+button.htmx-request.htmx-indicator span {
+    display: none;
+}
+
+button.htmx-request.htmx-indicator img {
+    display: inline;
+}

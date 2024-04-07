@@ -1,0 +1,69 @@
+package pages
+
+import "github.com/hunterwilkins2/trolly/components"
+
+templ Login(values map[string]string, errors map[string]error) {
+	@components.Base("Log in") {
+		<form
+ 			action="/login"
+ 			method="post"
+ 			hx-boost="true"
+ 			class="self-center w-full max-w-[35rem] h-min bg-white dark:bg-zinc-700 shadow-md rounded px-8 pt-6 pb-8"
+ 			hx-indicator="#indicator"
+		>
+			<h1 class="text-xl font-bold mb-4">Log In</h1>
+			if flash, ok := ctx.Value(components.FlashKey).(string); ok {
+				<div class="bg-red-400 text-white rounded font-bold py-1 px-2 mb-3">
+					{ flash }
+				</div>
+			}
+			<div class="mb-1">
+				<label for="email" class="block text-gray-700 dark:text-gray-200 text-sm font-bold mb-2">Email</label>
+				<input
+ 					type="email"
+ 					name="email"
+ 					id="email"
+ 					novalidate
+ 					placeholder="Email address"
+ 					value={ values["email"] }
+ 					class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 dark:text-gray-200 dark:bg-zinc-800  dark:border-zinc-900 dark:placeholder:text-gray-400 leading-tight focus:outline-none focus:shadow-outline"
+ 					hx-post="/user/validate/email"
+ 					hx-trigger="keyup changed delay:500ms"
+ 					hx-target="next .error"
+ 					hx-sync="this:replace"
+ 					hx-indicator="this"
+				/>
+				<div class="error">
+					if errors != nil && errors["email"] != nil {
+						{ errors["email"].Error() }
+					}
+				</div>
+			</div>
+			<div class="mb-1">
+				<label for="name" class="block text-gray-700 dark:text-gray-200 text-sm font-bold mb-2">Password</label>
+				<input
+ 					type="password"
+ 					name="password"
+ 					id="password"
+ 					placeholder="Password"
+ 					novalidate
+ 					class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 dark:text-gray-200 dark:bg-zinc-800  dark:border-zinc-900 dark:placeholder:text-gray-400 leading-tight focus:outline-none focus:shadow-outline"
+ 					hx-post="/user/validate/password"
+ 					hx-trigger="keyup changed delay:500ms"
+ 					hx-target="next .error"
+ 					hx-sync="this:replace"
+ 					hx-indicator="this"
+				/>
+				<div class="error">
+					if errors != nil && errors["password"] != nil {
+						{ errors["password"].Error() }
+					}
+				</div>
+			</div>
+			<button id="indicator" class="htmx-indicator w-full py-2 px-1 rounded font-semibold text-neutral-800 bg-logoYellow dark:bg-darkLogoYellow">
+				<span>Sign up</span>
+				<img class="" src="/static/img/spinner.svg"/>
+			</button>
+		</form>
+	}
+}

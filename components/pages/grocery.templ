@@ -1,0 +1,144 @@
+package pages
+
+import (
+	"fmt"
+)
+import "github.com/hunterwilkins2/trolly/components"
+import "github.com/hunterwilkins2/trolly/internal/models"
+
+templ GroceryList(basket models.Basket) {
+	@components.Base("") {
+		<div id="groceries" class="w-full mt-8">
+			if flash, ok := ctx.Value(components.FlashKey).(string); ok {
+				<div class="bg-red-400 text-white rounded font-bold py-1 px-2 mb-3">
+					{ flash }
+				</div>
+			}
+			<form
+ 				hx-post="/basket"
+ 				hx-target="#groceries"
+ 				hx-swap="outerHTML"
+ 				hx-select="#groceries"
+			>
+				<div>
+					<div class="flex">
+						<input
+ 							type="text"
+ 							name="item"
+ 							id="item"
+ 							novalidate
+ 							autocomplete="off"
+ 							placeholder="Search for an item..."
+ 							class="shadow appearance-none border rounded-l w-full py-2 px-3 text-gray-700 dark:text-gray-200 dark:bg-zinc-700  dark:border-zinc-800 dark:placeholder:text-gray-400 leading-tight focus:outline-none focus:shadow-outline"
+ 							hx-disinherit="*"
+ 							hx-get="/suggestions"
+ 							hx-trigger="click, keyup changed delay:500ms"
+ 							hx-target="#suggestions"
+ 							hx-swap="innerHTML"
+ 							hx-sync="this:replace"
+ 							hx-select="#results"
+						/>
+						<button class="flex items-center font-semibold py-2 px-2 md:px-6 lg:px-8 rounded-r-lg text-neutral-800 bg-logoYellow dark:darkLogoYellow shadow-md border dark:border-zinc-800"><i class="fa-solid fa-plus mr-3"></i>Add</button>
+					</div>
+					<div id="suggestions" class="relative"></div>
+				</div>
+			</form>
+			if len(basket.Items) > 0 {
+				<h2 class="text-right mt-6 mb-1 text-xl">Total { fmt.Sprintf("$%.2f", basket.Total) }</h2>
+				<table id="items" class="w-full mt-3 table-auto shadow-md bg-white dark:bg-zinc-700">
+					<thead class="bg-neutral-50 dark:bg-zinc-600 border-b font-mediumm dark:border-neutral-500">
+						<tr>
+							<th class="px-4 py-2 md:px-6 md:py-4">Name</th>
+							<th class="px-4 py-2 md:px-6 md:py-4 text-right">Price</th>
+							<th class="px-4 py-2 md:px-6 md:py-4"></th>
+						</tr>
+					</thead>
+					<tbody id="table-items">
+						for _, item := range basket.Items {
+							@BasketItem(item)
+						}
+					</tbody>
+				</table>
+				<p
+ 					class="text-sm text-semibold text-center mt-5 text-neutral-500 hover:text-neutral-400 cursor-pointer"
+ 					hx-delete="/basket"
+ 					hx-swap="outerHTML"
+ 					hx-target="#groceries"
+ 					hx-select="#groceries"
+				>
+					Remove all items
+				</p>
+			} else {
+				<p id="items" class="mt-6 text-center text-2xl text-neutral-400 dark:text-zinc-600">Add items to get started...</p>
+			}
+		</div>
+		<script src="/static/js/clear-suggestions.js"></script>
+	}
+}
+
+templ BasketItem(item models.BasketItem) {
+	<tr
+ 		id={ fmt.Sprintf("item-%d", item.BasketID) }
+ 		class="border-b transition duration-300 ease-in-out hover:bg-neutral-100 dark:border-zinc-500 dark:hover:bg-zinc-600"
+	>
+		<td
+ 			class={
+				"px-4 py-2 md:px-6 md:py-4 text-center ",
+				templ.KV("line-through decoration-[3px] decoration-logoYellow dark:decoration-darkLogoYellow", item.Purchased),
+			}
+ 			hx-patch={ fmt.Sprintf("/basket/%d", item.BasketID) }
+ 			hx-swap="outerHTML"
+ 			hx-target={ fmt.Sprintf("#item-%d", item.BasketID) }
+ 			hx-trigger="click"
+		>
+			{ item.Name }
+		</td>
+		<td
+ 			class=" px-4 py-2 md:px-6 md:py-4 text-right"
+ 			hx-patch={ fmt.Sprintf("/basket/%d", item.BasketID) }
+ 			hx-swap="outerHTML"
+ 			hx-target={ fmt.Sprintf("#item-%d", item.BasketID) }
+ 			hx-trigger="click"
+		>
+			if item.Price != 0 {
+				{ fmt.Sprintf("$%.2f", item.Price) }
+			}
+		</td>
+		<td
+ 			hx-delete={ fmt.Sprintf("/basket/%d", item.BasketID) }
+ 			hx-trigger="click"
+ 			hx-target="#groceries"
+ 			hx-swap="outerHTML"
+ 			hx-select="#groceries"
+ 			class=" px-4 py-2 md:px-6 md:py-4 text-center border-l dark:border-neutral-500 text-red-500 dark:text-red-400 hover:cursor-pointer"
+		>
+			<i class="fa-solid fa-trash-can"></i>
+		</td>
+	</tr>
+}
+
+templ BasketSearch(items []models.Item) {
+	<div id="results" class="absolute w-full border-2 border-neutral-400 border-t-0 dark:border-zinc-600 bg-zinc-200 dark:bg-zinc-500 rounded-b">
+		if len(items) > 0 {
+			for _, item := range items {
+				<div
+ 					class="flex justify-between px-4 py-2 hover:bg-zinc-100 hover:dark:bg-zinc-600"
+ 					hx-post={ fmt.Sprintf("/basket/%d", item.ID) }
+ 					hx-trigger="click"
+ 					hx-target="#groceries"
+ 					hx-swap="outerHTML"
+ 					hx-select="#groceries"
+				>
+					<p>{ item.Name }</p>
+					<p>
+						if item.Price != 0 {
+							{ fmt.Sprintf("$%.2f", item.Price) }
+						}
+					</p>
+				</div>
+			}
+		} else {
+			<p class="px-4 py-2">No matching items</p>
+		}
+	</div>
+}

@@ -1,0 +1,22 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: {{- include "trolly.dbname" .}}
+spec:
+  selector:
+    matchLabels:
+  replicas: {{ .Values.db.replicas }} 
+  template:
+    metadata:
+      labels:
+  spec:
+    containers:
+    - name: {{- include "trolly.dbname" .}}
+      image: "{{ .Values.db.image }}:{{ .Values.image.tag | default latest }}"
+      imagePullPolicy: {{ IfNotPresent }}
+      ports:
+        - name: http
+        containerPort: {{ .Values.db.port }}
+        protocol: TCP
+
+

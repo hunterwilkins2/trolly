@@ -1,0 +1,203 @@
+package pages
+
+import "github.com/hunterwilkins2/trolly/components"
+import "github.com/hunterwilkins2/trolly/internal/models"
+import "fmt"
+
+templ Pantry(search string, orderBy string, metadata models.Metadata, items []models.Item) {
+	@components.Base("Pantry") {
+		<div id="pantry" class="w-full mt-8">
+			if flash, ok := ctx.Value(components.FlashKey).(string); ok {
+				<div class="bg-red-400 text-white rounded font-bold py-1 px-2 mb-3">
+					{ flash }
+				</div>
+			}
+			<form
+ 				hx-post="/items"
+ 				hx-target="#pantry"
+ 				hx-swap="outerHTML"
+ 				hx-select="#pantry"
+			>
+				<div class="flex">
+					<input
+ 						type="text"
+ 						name="item"
+ 						id="item"
+ 						value={ search }
+ 						novalidate
+ 						autocomplete="off"
+ 						placeholder="Add an item..."
+ 						class="shadow appearance-none border rounded-l w-full py-2 px-3 text-gray-700 dark:text-gray-200 dark:bg-zinc-700  dark:border-zinc-800 dark:placeholder:text-gray-400 leading-tight focus:outline-none focus:shadow-outline"
+ 						hx-post="/search"
+ 						hx-trigger="keyup changed delay:500ms"
+ 						hx-target="#pantry"
+ 						hx-select="#pantry"
+ 						hx-sync="this:replace"
+ 						hx-include="[name='orderBy']"
+					/>
+					<button class="flex items-center font-semibold py-2 px-2 md:px-6 lg:px-8 rounded-r-lg text-neutral-800 bg-logoYellow dark:darkLogoYellow shadow-md border dark:border-zinc-800"><i class="fa-solid fa-plus mr-3"></i>Add</button>
+				</div>
+				<div class="flex flex-col md:flex-row md:space-x-4 mt-2">
+					<div class="flex items-center space-x-1">
+						<input
+ 							class="appearance-none w-4 h-4 bg-white dark:bg-zinc-600 border-2 border-neutral-400 dark:border-neutral-900 rounded-full checked:bg-logoYellow  dark:checked:bg-darkLogoYellow"
+ 							type="radio"
+ 							id="timesBought"
+ 							name="orderBy"
+ 							value="timesBought"
+ 							if orderBy == "timesBought" {
+								checked
+							}
+ 							hx-post="/search"
+ 							hx-target="#pantry"
+ 							hx-select="#pantry"
+ 							hx-sync="this:replace"
+ 							hx-include="[name='item']"
+						/>
+						<label for="timesBought">Times Bought</label>
+					</div>
+					<div class="flex items-center space-x-1">
+						<input
+ 							class="appearance-none w-4 h-4 bg-white dark:bg-zinc-600 border-2 border-neutral-400 dark:border-neutral-900 rounded-full checked:bg-logoYellow  dark:checked:bg-darkLogoYellow"
+ 							type="radio"
+ 							id="recentlyAdded"
+ 							name="orderBy"
+ 							value="recentlyAdded"
+ 							if orderBy == "recentlyAdded" {
+								checked
+							}
+ 							hx-post="/search"
+ 							hx-target="#pantry"
+ 							hx-select="#pantry"
+ 							hx-sync="this:replace"
+ 							hx-include="[name='item']"
+						/>
+						<label for="recentlyAdded">Recently Added</label>
+					</div>
+					<div class="flex items-center space-x-1">
+						<input
+ 							class="appearance-none w-4 h-4 bg-white dark:bg-zinc-600 border-2 border-neutral-400 dark:border-neutral-900 rounded-full checked:bg-logoYellow  dark:checked:bg-darkLogoYellow"
+ 							type="radio"
+ 							id="recentlyPurchased"
+ 							name="orderBy"
+ 							value="recentlyPurchased"
+ 							if orderBy == "recentlyPurchased" {
+								checked
+							}
+ 							hx-post="/search"
+ 							hx-target="#pantry"
+ 							hx-select="#pantry"
+ 							hx-sync="this:replace"
+ 							hx-include="[name='item']"
+						/>
+						<label for="recentlyPurchased">Recently Purchased</label>
+					</div>
+				</div>
+			</form>
+			if len(items) > 0 {
+				<table id="items" class="w-full mt-6 table-auto shadow-md bg-white dark:bg-zinc-700">
+					<thead class="bg-neutral-50 dark:bg-zinc-600 border-b font-mediumm dark:border-neutral-500">
+						<tr>
+							<th class="px-4 py-2 md:px-6 md:py-4"></th>
+							<th class="px-4 py-2 md:px-6 md:py-4">Name</th>
+							<th class="px-4 py-2 md:px-6 md:py-4 text-right">Price</th>
+							<th class="px-4 py-2 md:px-6 md:py-4"></th>
+							<th class="px-4 py-2 md:px-6 md:py-4"></th>
+						</tr>
+					</thead>
+					<tbody>
+						for _, item := range items {
+							@Item(item)
+						}
+					</tbody>
+				</table>
+				<div class="flex justify-end space-x-3 mt-3 text-sky-600">
+					for i := max(1, min(metadata.CurrentPage - 2, metadata.LastPage - 4)); i <= min(max(1, min(metadata.CurrentPage - 2, metadata.LastPage - 4)) + 4, metadata.LastPage); i++ {
+						<a
+ 							class={ "text-xl cursor-pointer hover:underline", templ.KV("underline text-logoYellow dark:logoDarkYellow", i == metadata.CurrentPage) }
+ 							hx-post={ fmt.Sprintf("/search?page=%d", i) }
+ 							hx-target="#pantry"
+ 							hx-select="#pantry"
+ 							hx-swap="outerHTML"
+ 							hx-sync="this:replace"
+ 							hx-include="[name='item'], [name='orderBy']"
+						>
+							{ fmt.Sprint(i) }
+						</a>
+					}
+				</div>
+			} else {
+				<p id="items" class="mt-6 text-center text-2xl text-neutral-400 dark:text-zinc-600">Add items to get started...</p>
+			}
+		</div>
+	}
+}
+
+templ Item(item models.Item) {
+	<tr id={ fmt.Sprintf("item-%d", item.ID) } class="border-b transition duration-300 ease-in-out hover:bg-neutral-100 dark:border-zinc-500 dark:hover:bg-zinc-600">
+		<td
+ 			hx-post={ fmt.Sprintf("/basket/%d", item.ID) }
+ 			hx-swap="none"
+ 			class=" px-4 py-2 md:px-6 md:py-4 text-center border-r dark:border-neutral-500 text-neutral-300 dark:text-neutral-400 hover:cursor-pointer"
+		>
+			<i class="fa-solid fa-basket-shopping"></i>
+		</td>
+		<td class="px-4 py-2 md:px-6 md:py-4 text-center ">{ item.Name }</td>
+		<td class=" px-4 py-2 md:px-6 md:py-4 text-right">
+			if item.Price != 0 {
+				{ fmt.Sprintf("$%.2f", item.Price) }
+			}
+		</td>
+		<td
+ 			hx-get={ fmt.Sprintf("/items/edit?id=%d", item.ID) }
+ 			hx-target={ fmt.Sprintf("#item-%d", item.ID) }
+ 			hx-swap="outerHTML"
+ 			class=" px-4 py-2 md:px-6 md:py-4 text-center border-l dark:border-neutral-500 text-neutral-500 dark:text-neutral-300 hover:cursor-pointer"
+		>
+			<i class="fa-solid fa-pen-to-square"></i>
+		</td>
+		<td
+ 			hx-delete={ fmt.Sprintf("/items/%d", item.ID) }
+ 			hx-trigger="click"
+ 			hx-target={ fmt.Sprintf("#item-%d", item.ID) }
+ 			hx-swap="delete"
+ 			class=" px-4 py-2 md:px-6 md:py-4 text-center border-l dark:border-neutral-500 text-red-500 dark:text-red-400 hover:cursor-pointer"
+		>
+			<i class="fa-solid fa-trash-can"></i>
+		</td>
+	</tr>
+}
+
+templ EditItem(item models.Item) {
+	<tr id={ fmt.Sprintf("item-%d", item.ID) } class="border-b transition duration-300 ease-in-out hover:bg-neutral-100 dark:border-zinc-500 dark:hover:bg-zinc-600">
+		<td colspan="2" class="">
+			<input
+ 				class="h-10 md:h-14 text-center shadow appearance-none border rounded-l w-full py-2 px-3 text-gray-700 dark:text-gray-200 bg-neutral-50 dark:bg-zinc-600  dark:border-zinc-800 dark:placeholder:text-gray-400 leading-tight focus:outline-none focus:shadow-outline"
+ 				type="text"
+ 				id="name"
+ 				name="name"
+ 				value={ item.Name }
+			/>
+		</td>
+		<td class="relative">
+			<span class="absolute top-2 md:top-4 left-4 md:left-6">$</span>
+			<input
+ 				class="h-10 md:h-14 text-right shadow appearance-none border rounded-l w-full py-2 px-3 text-gray-700 dark:text-gray-200 bg-neutral-50 dark:bg-zinc-600  dark:border-zinc-800 dark:placeholder:text-gray-400 leading-tight focus:outline-none focus:shadow-outline"
+ 				type="text"
+ 				id="price"
+ 				name="price"
+ 				value={ fmt.Sprintf("%.2f", item.Price) }
+			/>
+		</td>
+		<td
+ 			colspan="2"
+ 			class=" px-4 py-2 md:px-6 md:py-4 text-center border-l dark:border-neutral-500 text-neutral-500 dark:text-neutral-300 hover:cursor-pointer"
+ 			hx-patch={ fmt.Sprintf("/items/%d", item.ID) }
+ 			hx-target={ fmt.Sprintf("#item-%d", item.ID) }
+ 			hx-swap="outerHTML"
+ 			hx-include="[name='name'], [name='price']"
+		>
+			<i class="fa-solid fa-floppy-disk"></i>
+		</td>
+	</tr>
+}

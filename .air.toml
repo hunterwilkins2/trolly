@@ -1,0 +1,21 @@
+root = "."
+tmp_dir = "bin"
+
+[build]
+cmd = "make build"
+bin = "bin/trolly"
+include_ext = ["go", "html", "css", "templ", "js", "jpeg", "jpg", "gif", "png", "svg", "webp", "ico", "sql"]
+exclude_file = ["ui/static/css/dist/output.css", "components/*.go", "components/pages/*.go", "components/partials/*.go", "components/layout/*.go"]
+delay = 100
+args_bin = ["-hot-reload"]
+
+[misc]
+clean_on_exit = true
+
+[log]
+time = false
+main_only = true
+
+[screen]
+clean_on_rebuild = true
+keep_scroll = true
