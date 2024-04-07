@@ -26,8 +26,20 @@ build: tailwind/build templ/build
 db:
 	docker run --name trolly-db -p 3306:3306 -e MARIADB_DATABASE=trolly -e MARIADB_ROOT_PASSWORD=admin -e MARIADB_USER=trolly -e MARIADB_PASSWORD=pa55word -d mariadb:latest
 
+## migrate: runs migrations
+.PHONY: migrate
 migrate:
 	migrate -path=./migrations -database="mysql://trolly:pa55word@tcp(0.0.0.0:3306)/trolly" up
+
+## docker/build: builds trolly docker image
+.PHONY: docker/build
+docker/build: templ/build tailwind/build
+	docker build -t trolly -f devops/Dockerfile .
+
+## migrate/build: builds migration docker image
+.PHONY: migrate/build
+migrate/build:
+	docker build -t trolly/migrate -f devops/migration.dockerfile .
 
 # Utilites
 .PHONY: help
