@@ -7,6 +7,7 @@ import (
 	"flag"
 	"fmt"
 	"log/slog"
+	"math"
 	"net/http"
 	"os"
 	"os/signal"
@@ -111,7 +112,7 @@ func main() {
 	})
 
 	srv := &http.Server{
-		Addr:              fmt.Sprintf("127.0.0.1:%d", *port),
+		Addr:              fmt.Sprintf(":%d", *port),
 		ReadTimeout:       1 * time.Second,
 		WriteTimeout:      1 * time.Second,
 		IdleTimeout:       30 * time.Second,
@@ -132,7 +133,7 @@ func main() {
 		shutdownErr <- srv.Shutdown(timeout)
 	}()
 
-	logger.Info("starting server", "addr", "http://"+srv.Addr)
+	logger.Info("starting server", "addr", fmt.Sprintf("http://localhost:%d", *port))
 	err = srv.ListenAndServe()
 	if err != nil {
 		logger.Error("uncaught error occurred", "error", err)
@@ -148,8 +149,12 @@ func main() {
 }
 
 func openDb(dbHost, dbUser, dbPass, dbName string) (*sql.DB, error) {
-	db, err := sql.Open("mysql", fmt.Sprintf("%s:%s@tcp(%s)/%s?parseTime=true", dbUser, dbPass, dbHost, dbName))
-	if err != nil {
+	var db *sql.DB
+	if err := retryWithBackoff(func() error {
+		_db, err := sql.Open("mysql", fmt.Sprintf("%s:%s@tcp(%s)/%s?parseTime=true", dbUser, dbPass, dbHost, dbName))
+		db = _db
+		return err
+	})(); err != nil {
 		return nil, err
 	}
 
@@ -157,8 +162,33 @@ func openDb(dbHost, dbUser, dbPass, dbName string) (*sql.DB, error) {
 	db.SetConnMaxIdleTime(3 * time.Minute)
 	db.SetMaxOpenConns(10)
 	db.SetMaxIdleConns(10)
-	if err = db.Ping(); err != nil {
+	if err := retryWithBackoff(func() error { return db.Ping() })(); err != nil {
 		return nil, err
 	}
 	return db, nil
+}
+
+const (
+	maxRetries = 5
+	baseDelay  = 1 * time.Second
+)
+
+type retryFunc func() error
+
+func retryWithBackoff(f retryFunc) retryFunc {
+	return func() error {
+		var lastError error
+		for i := 0; i < maxRetries; i++ {
+			err := f()
+			if err == nil {
+				return nil
+			}
+			secRetry := math.Pow(2, float64(i))
+			fmt.Printf("Could not connect to database. Retrying in %.2fs\n", secRetry)
+			delay := time.Duration(secRetry) * baseDelay
+			time.Sleep(delay)
+			lastError = err
+		}
+		return lastError
+	}
 }

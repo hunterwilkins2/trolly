@@ -25,4 +25,10 @@ Trolly is a mobile site designed for managing grocery lists and estimating groce
 3. Run the binary with `./bin/trolly`
 4. Open http://localhost:4000 to view the application
 
+## Helm
 
+Deploy with kubernetes using helm
+
+```
+helm install trolly ../homelab-charts/ -n trolly --create-namespace -f devops/values.yaml 
+```

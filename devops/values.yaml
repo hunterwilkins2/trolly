@@ -1,0 +1,58 @@
+image:
+  repository: galaxyproduction/trolly
+  tag: "latest"
+  pullPolicy: Always
+
+service:
+  targetPort: 4000
+  port: 80
+
+ingress:
+  enabled: true
+  annotations:
+    spec.ingressClassName: traefik
+    cert-manager.io/cluster-issuer: letsencrypt-prod
+  hosts:
+  - host: trolly.hunterwilkins.dev
+    paths:
+    - path: /
+      pathType: ImplementationSpecific
+  tls:
+  - hosts:
+    - trolly.hunterwilkins.dev
+    secretName: trolly-tls-secret
+
+command: "/trolly"
+args: ["-db-host=trolly-db-service.trolly.svc.cluster.local:3306", "-db-name=trolly", "-db-pass=pa55word", "-db-user=trolly"]
+
+homelab-charts-db:
+  enable: true
+
+  image:
+    repository: mariadb
+    tag: "latest"
+
+  volumes:
+  - name: trolly-db-claim
+    type: NFS
+    mountPath: "/var/lib/mysql"
+    accessModes:
+    - ReadWriteOnce
+    storage: 10Gi
+
+  secrets:
+    MARIADB_DATABASE: "trolly"
+    MARIADB_ROOT_PASSWORD: "admin"
+    MARIADB_USER: "trolly"
+    MARIADB_PASSWORD: "pa55word"
+
+  migration:
+    enable: true
+    image: "galaxyproduction/trolly-migrate"
+    tag: "latest"
+    pullPolicy: Always
+
+    env:
+      DB_HOST: "trolly-db-service:3306"
+      DB_USER: "trolly"
+      DB_PASS: "pa55word"
