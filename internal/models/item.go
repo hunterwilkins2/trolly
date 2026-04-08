@@ -55,8 +55,8 @@ func (r *ItemRepository) GetAll(ctx context.Context, search string, page int, pa
 	stmt := fmt.Sprintf(`
 	SELECT count(*) OVER(), id, name, price, times_bought
 	FROM items	
-	WHERE user_id = ? AND (? = '' OR name LIKE CONCAT('%%', ?, '%%'))
-	ORDER BY %s DESC, id DESC 
+	WHERE user_id = ? AND (? = '' OR name LIKE CONCAT('%%', TRIM(?), '%%'))
+	ORDER BY price = 0 DESC, %s DESC, id DESC 
 	LIMIT ? OFFSET ?
 	`, orderedBy(orderBy))
 
@@ -98,6 +98,22 @@ func (r *ItemRepository) GetById(ctx context.Context, id int64) (Item, error) {
 
 	item := &Item{}
 	err := r.db.QueryRowContext(ctx, stmt, userId, id).Scan(&item.ID, &item.Name, &item.Price, &item.TimesBought)
+	if err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			return Item{}, ErrItemNotFound
+		}
+		return Item{}, err
+	}
+	return *item, nil
+}
+
+func (r *ItemRepository) GetByName(ctx context.Context, name string) (Item, error) {
+	userId := ctx.Value(components.UserKey).(uuid.UUID)
+	stmt := `SELECT id, name, price, times_bought FROM items
+	WHERE user_id = ? AND name = ?`
+
+	item := &Item{}
+	err := r.db.QueryRowContext(ctx, stmt, userId, name).Scan(&item.ID, &item.Name, &item.Price, &item.TimesBought)
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
 			return Item{}, ErrItemNotFound

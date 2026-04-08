@@ -40,7 +40,8 @@ func (r *BasketRepository) Get(ctx context.Context) (Basket, error) {
 	FROM basket b 
 	INNER JOIN items i 
 	ON i.id = b.item_id 
-	WHERE b.user_id = ?`
+	WHERE b.user_id = ?
+	ORDER BY b.purchased ASC`
 
 	rows, err := r.db.QueryContext(ctx, stmt, userId)
 	if err != nil {

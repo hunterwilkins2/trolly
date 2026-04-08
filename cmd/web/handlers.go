@@ -327,7 +327,13 @@ func (app *application) MarkPurchased(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	app.logger.Info("updated item status", "item", item)
-	pages.BasketItem(item).Render(r.Context(), w)
+
+	items, err := app.basket.GetItems(r.Context())
+	if err != nil {
+		app.logger.Error("could not get items", "error", err.Error)
+		r = r.WithContext(context.WithValue(r.Context(), components.FlashKey, "Could not get items"))
+	}
+	pages.GroceryList(items).Render(r.Context(), w)
 }
 
 func (app *application) RemoveItemFromBasket(w http.ResponseWriter, r *http.Request) {

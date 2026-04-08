@@ -22,11 +22,16 @@ func (s *ItemService) Search(ctx context.Context, query string, page int, pageSi
 }
 
 func (s *ItemService) Add(ctx context.Context, name string, price float32) (models.Item, error) {
+	existingItem, err := s.repository.GetByName(ctx, name)
+	if err == nil {
+		return existingItem, nil
+	}
+
 	item := &models.Item{
 		Name:  name,
 		Price: price,
 	}
-	err := s.repository.Create(ctx, item)
+	err = s.repository.Create(ctx, item)
 	if err != nil {
 		return models.Item{}, err
 	}

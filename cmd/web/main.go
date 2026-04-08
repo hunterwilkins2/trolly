@@ -151,7 +151,7 @@ func main() {
 func openDb(dbHost, dbUser, dbPass, dbName string) (*sql.DB, error) {
 	var db *sql.DB
 	if err := retryWithBackoff(func() error {
-		_db, err := sql.Open("mysql", fmt.Sprintf("%s:%s@tcp(%s)/%s?parseTime=true", dbUser, dbPass, dbHost, dbName))
+		_db, err := sql.Open("mysql", fmt.Sprintf("%s:%s@%s/%s?parseTime=true", dbUser, dbPass, dbHost, dbName))
 		db = _db
 		return err
 	})(); err != nil {

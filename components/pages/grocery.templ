@@ -88,7 +88,8 @@ templ BasketItem(item models.BasketItem) {
 			}
  			hx-patch={ fmt.Sprintf("/basket/%d", item.BasketID) }
  			hx-swap="outerHTML"
- 			hx-target={ fmt.Sprintf("#item-%d", item.BasketID) }
+ 			hx-target="#groceries"
+      hx-select="#groceries"
  			hx-trigger="click"
 		>
 			{ item.Name }
