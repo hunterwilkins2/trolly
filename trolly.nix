@@ -141,6 +141,7 @@
         CapabilityBoundingSet = "";
         LockPersonality = true;
         MemoryDenyWriteExecute = false;
+        WorkingDirectory = "${trolly}/bin";
         BindPaths = "/var/run/mysqld:/var/run/mysqld";
         MountAPIVFS = true;
         NoNewPrivileges = true;
