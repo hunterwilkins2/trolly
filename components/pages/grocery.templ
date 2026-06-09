@@ -98,7 +98,8 @@ templ BasketItem(item models.BasketItem) {
  			class=" px-4 py-2 md:px-6 md:py-4 text-right"
  			hx-patch={ fmt.Sprintf("/basket/%d", item.BasketID) }
  			hx-swap="outerHTML"
- 			hx-target={ fmt.Sprintf("#item-%d", item.BasketID) }
+ 			hx-target="#groceries"
+      hx-select="#groceries"
  			hx-trigger="click"
 		>
 			if item.Price != 0 {
